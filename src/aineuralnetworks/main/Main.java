@@ -5,7 +5,9 @@
  */
 package aineuralnetworks.main;
 
+import aineuralnetworks.StateManager.StateManager;
 import aineuralnetworks.dinosaur.Dinosaur;
+import aineuralnetworks.frame.Console;
 import aineuralnetworks.frame.Frame;
 import aineuralnetworks.layers.NeuralNetwork;
 import java.awt.Canvas;
@@ -13,8 +15,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.util.ConcurrentModificationException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
@@ -23,8 +24,11 @@ import java.util.logging.Logger;
 public class Main extends Canvas implements Runnable{
 
     public Thread thread;
+    public Thread updateThread;
     public Handler handler;
     public NeuralNetwork network;
+    public StateManager states;
+    public Console console;
     public int subject = 0;
     
     /**
@@ -34,10 +38,13 @@ public class Main extends Canvas implements Runnable{
     // starting frame
     public static void main(String[] args){
         Frame frame = new Frame(new Main());
-    }   
+    }
+    
     public Main(){
         network = new NeuralNetwork();
+        console = new Console(this);
         handler = new Handler(this, network);
+        states = new StateManager(GameState.LEARNING);
         gameStarted();
     }
     //initialize thread, starting thread
@@ -57,14 +64,18 @@ public class Main extends Canvas implements Runnable{
     *   the game starts or when dinosaurus dies;
     */
     public boolean gameStarted(){
-        network = new NeuralNetwork();
-        handler.network = network;
-        handler.dino.add(new Dinosaur(50,500));
-        network.initializeHiddenLayer();
-        network.calculateHiddenLayer();
-        this.subject++;
-        return true;
+        if(states.actualState().equals(GameState.LEARNING)){
+            network = new NeuralNetwork();
+            handler.network = network;
+            handler.dino.add(new Dinosaur(50,500));
+            network.initializeHiddenLayer();
+            network.calculateHiddenLayer();
+            this.subject++;
+            return true;
+        }
+        return false;
     }
+    
     @Override
     public void run(){
         while(thread.isAlive()){
@@ -72,12 +83,18 @@ public class Main extends Canvas implements Runnable{
         }
     }
     public void update() throws Exception{
-        Thread updateThread = new Thread(new Runnable(){
+       updateThread = new Thread(new Runnable(){
             @Override
             public void run(){
                 while(true){
                     handler.update();
-                    handler.generateCactus();
+                    if(states.actualState().equals(GameState.STOPPED)){
+                        try{
+                            updateThread.stop();
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
@@ -93,8 +110,8 @@ public class Main extends Canvas implements Runnable{
         g.setColor(Color.white);
         g.fillRect(0, 0, 10000, 1200);
         handler.render(g);
+        console.render(g);
         g.setColor(Color.BLACK);
-        g.drawString("subject: " + subject,150,150);
         g.dispose();
         bs.show();
     }

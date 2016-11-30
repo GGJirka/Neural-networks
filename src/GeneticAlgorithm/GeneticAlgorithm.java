@@ -26,7 +26,7 @@ public class GeneticAlgorithm implements IGeneticAlgorithm{
     */
     
     @Override
-    public void createMatingPool() {
+    public void createMatingPool(){ 
         
     }
     /*

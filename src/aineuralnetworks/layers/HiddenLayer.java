@@ -25,8 +25,7 @@ public class HiddenLayer extends AHiddenLayer {
     public double calculateWeightedSum(){
         double weightedSum = 0;
         for(int i=0;i<weights.length;i++){
-            weightedSum+=weights[i]*inputs[i];
-            
+            weightedSum+=weights[i]*inputs[i];            
         }
         return weightedSum;
     }
@@ -45,4 +44,5 @@ public class HiddenLayer extends AHiddenLayer {
         }
         return adjustedWeights;
     }
+    
 }
