@@ -25,13 +25,13 @@ public class HiddenLayer extends AHiddenLayer {
     public double calculateWeightedSum(){
         double weightedSum = 0;
         for(int i=0;i<weights.length;i++){
-            weightedSum+=weights[i]*inputs[i];            
+            weightedSum+=weights[i]*inputs[i];    
         }
         return weightedSum;
     }
     @Override
     public double activationFunction(double sum){
-        return (1/(1+Math.exp(-sum)));
+        return (1/(1+Math.exp(-sum/1000)));
         //return Math.exp(-Math.pow(sum,2));
         //return Math.sin(sum)/2+0.5;
     }

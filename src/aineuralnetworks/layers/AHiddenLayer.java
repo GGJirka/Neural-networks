@@ -15,10 +15,12 @@ public abstract class AHiddenLayer{
     
     public double[] inputs;
     public double[] weights;
-    
+    public double[] oldWeights;
+            
     public AHiddenLayer(double[] inputs, double[] weights){
         this.inputs = inputs;
         this.weights = weights;
+        oldWeights = new double[weights.length];
     }
     public AHiddenLayer(double[] inputs){
         this.inputs = inputs;
